@@ -62,6 +62,8 @@ class LiteClient:
         self.curr_x = None
         self.reference_time = None
         self.is_calibrated = False
+        self.m = None
+        self.c = None
 
     def thread_management_connection(self):
         self.loop = asyncio.new_event_loop()
@@ -285,6 +287,7 @@ class LiteForm(tk.Frame):
             self.client.calibration_values = self.values # pushes the values to the client 
             self.client.gen_calib_formula()
             self.client.update_calibration_state(CALIBRATED_STATUS_MESSAGE)
+            print(f"saved calibration data: {self.values}")
 
         except ValueError:
             pass
@@ -470,13 +473,12 @@ class GUIApp(tk.Frame):
             if self.client_status.item(item_id)["values"][1] == address:
                 self.client_status.item(item_id, values=(self.client_status.item(item_id)["values"][0],address, status))
                 updated_item = self.client_status.item(item_id)["values"]
-                self.graph.radio_both.config(state=tk.ACTIVE)
-                self.graph.radio_calibrated.config(state=tk.ACTIVE)
 
         if updated_item:
             if all([self.client_status.item(item_id)["values"][2]==CALIBRATED_STATUS_MESSAGE for item_id in self.client_status.get_children()]):
                 self.is_calibrated = True
-                # insert logic to turn plot option radio buttons active...
+                self.graph.radio_both.config(state=tk.ACTIVE)
+                self.graph.radio_calibrated.config(state=tk.ACTIVE)
             else:
                 self.is_calibrated = False
 
